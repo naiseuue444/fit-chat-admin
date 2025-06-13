@@ -14,7 +14,7 @@ const GymSignup = () => {
   const [formData, setFormData] = useState({
     name: "",
     owner_name: "",
-    whatsapp_number: "",
+    phone_number: "",
     address: "",
     membership_plans: "",
     offers: "",
@@ -43,7 +43,7 @@ const GymSignup = () => {
         .from("admins")
         .insert([{
           gym_id: data.gym_id,
-          number: formData.whatsapp_number
+          number: formData.phone_number
         }]);
 
       setSubmittedGym(data);
@@ -109,11 +109,11 @@ const GymSignup = () => {
               </div>
 
               <div>
-                <Label htmlFor="whatsapp_number">WhatsApp Number *</Label>
+                <Label htmlFor="phone_number">WhatsApp Number *</Label>
                 <Input
-                  id="whatsapp_number"
-                  name="whatsapp_number"
-                  value={formData.whatsapp_number}
+                  id="phone_number"
+                  name="phone_number"
+                  value={formData.phone_number}
                   onChange={handleInputChange}
                   placeholder="+1234567890"
                   required

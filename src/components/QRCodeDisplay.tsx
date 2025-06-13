@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 const QRCodeDisplay = ({ gym }) => {
   const { toast } = useToast();
   const activationText = "/activate";
-  const whatsappUrl = `https://wa.me/${gym.whatsapp_number}?text=${encodeURIComponent(activationText)}`;
+  const whatsappUrl = `https://wa.me/${gym.phone_number}?text=${encodeURIComponent(activationText)}`;
   
   const copyToClipboard = () => {
     navigator.clipboard.writeText(whatsappUrl);

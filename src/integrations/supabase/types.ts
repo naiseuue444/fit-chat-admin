@@ -12,16 +12,19 @@ export type Database = {
       admins: {
         Row: {
           admin_id: string
+          created_at: string | null
           gym_id: string | null
           number: string | null
         }
         Insert: {
           admin_id?: string
+          created_at?: string | null
           gym_id?: string | null
           number?: string | null
         }
         Update: {
           admin_id?: string
+          created_at?: string | null
           gym_id?: string | null
           number?: string | null
         }
@@ -81,7 +84,10 @@ export type Database = {
           name: string | null
           offers: string | null
           owner_name: string | null
-          whatsapp_number: string | null
+          phone_number: string | null
+          whatsapp_connected_at: string | null
+          whatsapp_qr_code: string | null
+          whatsapp_status: string | null
         }
         Insert: {
           activated?: boolean | null
@@ -93,7 +99,10 @@ export type Database = {
           name?: string | null
           offers?: string | null
           owner_name?: string | null
-          whatsapp_number?: string | null
+          phone_number?: string | null
+          whatsapp_connected_at?: string | null
+          whatsapp_qr_code?: string | null
+          whatsapp_status?: string | null
         }
         Update: {
           activated?: boolean | null
@@ -105,7 +114,10 @@ export type Database = {
           name?: string | null
           offers?: string | null
           owner_name?: string | null
-          whatsapp_number?: string | null
+          phone_number?: string | null
+          whatsapp_connected_at?: string | null
+          whatsapp_qr_code?: string | null
+          whatsapp_status?: string | null
         }
         Relationships: []
       }
@@ -154,9 +166,11 @@ export type Database = {
           gym_id: string | null
           join_date: string | null
           member_id: string
+          monthly_goal: number | null
           name: string | null
           next_payment_date: string | null
           number: string | null
+          status: string | null
         }
         Insert: {
           created_at?: string | null
@@ -164,9 +178,11 @@ export type Database = {
           gym_id?: string | null
           join_date?: string | null
           member_id?: string
+          monthly_goal?: number | null
           name?: string | null
           next_payment_date?: string | null
           number?: string | null
+          status?: string | null
         }
         Update: {
           created_at?: string | null
@@ -174,9 +190,11 @@ export type Database = {
           gym_id?: string | null
           join_date?: string | null
           member_id?: string
+          monthly_goal?: number | null
           name?: string | null
           next_payment_date?: string | null
           number?: string | null
+          status?: string | null
         }
         Relationships: [
           {
@@ -197,6 +215,7 @@ export type Database = {
           next_due: string | null
           paid_on: string | null
           payment_id: string
+          status: string | null
         }
         Insert: {
           amount?: number | null
@@ -206,6 +225,7 @@ export type Database = {
           next_due?: string | null
           paid_on?: string | null
           payment_id?: string
+          status?: string | null
         }
         Update: {
           amount?: number | null
@@ -215,6 +235,7 @@ export type Database = {
           next_due?: string | null
           paid_on?: string | null
           payment_id?: string
+          status?: string | null
         }
         Relationships: [
           {
@@ -226,6 +247,54 @@ export type Database = {
           },
           {
             foreignKeyName: "payments_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["member_id"]
+          },
+        ]
+      }
+      workouts: {
+        Row: {
+          created_at: string | null
+          date: string | null
+          duration: number | null
+          gym_id: string | null
+          member_id: string | null
+          notes: string | null
+          type: string | null
+          workout_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          date?: string | null
+          duration?: number | null
+          gym_id?: string | null
+          member_id?: string | null
+          notes?: string | null
+          type?: string | null
+          workout_id?: string
+        }
+        Update: {
+          created_at?: string | null
+          date?: string | null
+          duration?: number | null
+          gym_id?: string | null
+          member_id?: string | null
+          notes?: string | null
+          type?: string | null
+          workout_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workouts_gym_id_fkey"
+            columns: ["gym_id"]
+            isOneToOne: false
+            referencedRelation: "gyms"
+            referencedColumns: ["gym_id"]
+          },
+          {
+            foreignKeyName: "workouts_member_id_fkey"
             columns: ["member_id"]
             isOneToOne: false
             referencedRelation: "members"
