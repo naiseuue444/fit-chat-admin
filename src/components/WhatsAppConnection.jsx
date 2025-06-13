@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, AlertCircle, QrCode } from "lucide-react";
+import { websocketService } from '@/services/websocket.service';
 
 export function WhatsAppConnection({ gymId }) {
   const [status, setStatus] = useState('loading');
@@ -9,11 +11,43 @@ export function WhatsAppConnection({ gymId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  useEffect(() => {
+    // Connect to WebSocket and join gym room
+    const socket = websocketService.connect();
+    websocketService.joinGymRoom(gymId);
+
+    // Listen for QR code updates
+    websocketService.onQRCode((qr) => {
+      setQrCode(qr);
+      setStatus('awaiting_scan');
+      setIsLoading(false);
+    });
+
+    // Listen for status updates
+    websocketService.onStatusChange((newStatus) => {
+      setStatus(newStatus);
+      if (newStatus === 'connected') {
+        setQrCode('');
+        setIsLoading(false);
+      }
+    });
+
+    // Check initial status
+    checkStatus();
+
+    return () => {
+      websocketService.disconnect();
+    };
+  }, [gymId]);
+
   const checkStatus = async () => {
     try {
-      const response = await fetch(`/api/gyms/${gymId}/whatsapp/status`);
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/gyms/${gymId}/whatsapp/status`);
       const data = await response.json();
       setStatus(data.status || 'disconnected');
+      if (data.qrCode) {
+        setQrCode(data.qrCode);
+      }
     } catch (err) {
       console.error('Error checking status:', err);
       setError('Failed to check WhatsApp status');
@@ -24,8 +58,11 @@ export function WhatsAppConnection({ gymId }) {
     setIsLoading(true);
     setError('');
     try {
-      const response = await fetch(`/api/gyms/${gymId}/whatsapp/connect`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/gyms/${gymId}/whatsapp/connect`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
       const data = await response.json();
       
@@ -45,7 +82,7 @@ export function WhatsAppConnection({ gymId }) {
 
   const disconnectWhatsApp = async () => {
     try {
-      await fetch(`/api/gyms/${gymId}/whatsapp/disconnect`, {
+      await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000'}/api/gyms/${gymId}/whatsapp/disconnect`, {
         method: 'POST',
       });
       setStatus('disconnected');
@@ -55,13 +92,6 @@ export function WhatsAppConnection({ gymId }) {
       setError('Failed to disconnect WhatsApp');
     }
   };
-
-  useEffect(() => {
-    checkStatus();
-    // Set up polling for status updates
-    const interval = setInterval(checkStatus, 5000);
-    return () => clearInterval(interval);
-  }, [gymId]);
 
   const getStatusBadge = () => {
     switch (status) {
