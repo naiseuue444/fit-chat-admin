@@ -46,23 +46,35 @@ const AnalyticsTab = ({ gymId }) => {
       const leads = leadsResult.data || [];
       const payments = paymentsResult.data || [];
 
-      // Calculate metrics
-      const totalRevenue = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+      // Calculate metrics with proper type safety
+      const totalRevenue = payments.reduce((sum, payment) => {
+        const amount = Number(payment.amount) || 0;
+        return sum + amount;
+      }, 0);
       
       const monthlyPayments = payments.filter(payment => {
-        const paymentDate = new Date(payment.paid_on || payment.created_at);
-        return paymentDate >= startOfMonth;
+        const paymentDateStr = payment.paid_on || payment.created_at;
+        if (!paymentDateStr) return false;
+        const paymentDate = new Date(paymentDateStr);
+        return !isNaN(paymentDate.getTime()) && paymentDate >= startOfMonth;
       });
-      const monthlyRevenue = monthlyPayments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+      
+      const monthlyRevenue = monthlyPayments.reduce((sum, payment) => {
+        const amount = Number(payment.amount) || 0;
+        return sum + amount;
+      }, 0);
 
       const newMembersThisMonth = members.filter(member => {
-        const joinDate = new Date(member.join_date || member.created_at);
-        return joinDate >= startOfMonth;
+        const joinDateStr = member.join_date || member.created_at;
+        if (!joinDateStr) return false;
+        const joinDate = new Date(joinDateStr);
+        return !isNaN(joinDate.getTime()) && joinDate >= startOfMonth;
       }).length;
 
       const newLeadsThisMonth = leads.filter(lead => {
+        if (!lead.created_at) return false;
         const leadDate = new Date(lead.created_at);
-        return leadDate >= startOfMonth;
+        return !isNaN(leadDate.getTime()) && leadDate >= startOfMonth;
       }).length;
 
       setAnalytics({
@@ -76,7 +88,11 @@ const AnalyticsTab = ({ gymId }) => {
           ...members.slice(0, 3).map(m => ({ type: 'member', data: m })),
           ...leads.slice(0, 3).map(l => ({ type: 'lead', data: l })),
           ...payments.slice(0, 3).map(p => ({ type: 'payment', data: p }))
-        ].sort((a, b) => new Date(b.data.created_at) - new Date(a.data.created_at)).slice(0, 5)
+        ].sort((a, b) => {
+          const dateA = new Date(a.data.created_at);
+          const dateB = new Date(b.data.created_at);
+          return dateB.getTime() - dateA.getTime();
+        }).slice(0, 5)
       });
     } catch (error) {
       toast({
@@ -129,7 +145,7 @@ const AnalyticsTab = ({ gymId }) => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${analytics.totalRevenue}</div>
-            <p className="text-xs text-mute-foreground">
+            <p className="text-xs text-muted-foreground">
               ${analytics.monthlyRevenue} this month
             </p>
           </CardContent>
