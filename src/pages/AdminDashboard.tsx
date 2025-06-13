@@ -10,6 +10,7 @@ import LeadsTab from "@/components/dashboard/LeadsTab";
 import PaymentsTab from "@/components/dashboard/PaymentsTab";
 import BroadcastTab from "@/components/dashboard/BroadcastTab";
 import AnalyticsTab from "@/components/dashboard/AnalyticsTab";
+import WhatsAppTab from "@/components/dashboard/WhatsAppTab";
 
 const AdminDashboard = () => {
   const [admin, setAdmin] = useState(null);
@@ -57,10 +58,11 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="members" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="members">Members</TabsTrigger>
             <TabsTrigger value="leads">Leads</TabsTrigger>
             <TabsTrigger value="payments">Payments</TabsTrigger>
+            <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
             <TabsTrigger value="broadcast">Broadcast</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
@@ -75,6 +77,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="payments">
             <PaymentsTab gymId={admin.gym_id} />
+          </TabsContent>
+
+          <TabsContent value="whatsapp">
+            <WhatsAppTab gymId={admin.gym_id} />
           </TabsContent>
 
           <TabsContent value="broadcast">
